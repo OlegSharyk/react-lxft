@@ -10,3 +10,5 @@ build.properties
 junit*.properties
 IgnoreLexer.java~
 .gradle
+node_modules
+*.zip

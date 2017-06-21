@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {hashHistory} from 'react-router';
+import { connect } from 'react-redux';
 
-const dataSource = [
-    {firstName: 'John', lastName: "Doe", active: false, id:1},
-    {firstName: "Mary", lastName: "Moe", active: false, id:2},
-    {firstName: "Peter", lastName: "Noname", active: true, id:3}
-];
+//const dataSource = [
+//    {firstName: 'John', lastName: "Doe", active: false, id:1},
+//    {firstName: "Mary", lastName: "Moe", active: false, id:2},
+//    {firstName: "Peter", lastName: "Noname", active: true, id:3}
+//];
 
 export class GridRecord extends React.Component {
     handleLastNameChange(e){
@@ -43,10 +44,10 @@ GridRecord.propTypes = {
     })
 };
 
-export default class GridComponent extends React.Component {
+export class GridComponent extends React.Component {
     constructor(){
         super();
-        this.state = {
+        this.props = {
             records:[]
         }
     }
@@ -58,12 +59,13 @@ export default class GridComponent extends React.Component {
     }
 
     toggleActive(index){
-        let {records} = this.state;
-        records[index].active = !records[index].active;
-        this.setState({
-            records:records
-        })
+        let {dispatch} = this.props;
+        dispatch({
+            type:"TOGGLE_ACTIVE",
+            value:index
+        });
     }
+
 
     handleFilterChange(e){
         let value = e.target.value;
@@ -75,7 +77,7 @@ export default class GridComponent extends React.Component {
     }
 
     updateLastName(index, newValue){
-        let {records} = this.state;
+        let {records} = this.props;
         records[index].lastName = newValue;
         this.setState({
             records:records
@@ -100,13 +102,27 @@ export default class GridComponent extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {this.state.records.map((record, index)=>{
+                    {this.props.records.map((record, index)=>{
                         return <GridRecord record={record} key={index} toggleActive={this.toggleActive.bind(this, index)} updateLastName={this.updateLastName.bind(this, index)}/>
                     })}
                     </tbody>
                 </table>
-                <div>{this.props.children && React.cloneElement(this.props.children, {records:this.state.records})}</div>
+                <div>{this.props.children && React.cloneElement(this.props.children, {records:this.props.records})}</div>
             </div>
         )
     }
 }
+
+GridComponent.propTypes= {
+    records: PropTypes.array.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        records: state.grid
+    }
+}
+
+export default connect(
+    mapStateToProps
+)(GridComponent)
