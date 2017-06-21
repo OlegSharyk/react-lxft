@@ -54,7 +54,7 @@ export class GridComponent extends React.Component {
     componentDidMount(){
         this.refs.filterInput && this.refs.filterInput.focus();
         this.setState({
-            records:dataSource
+            records:this.props.records
         })
     }
 
@@ -68,13 +68,21 @@ export class GridComponent extends React.Component {
 
 
     handleFilterChange(e){
-        let value = e.target.value;
-        // console.log(value);
-        var records = dataSource.filter((record) => record.firstName.toUpperCase().includes(value.toUpperCase()));
-        this.setState({
-            records:records
-        })
+        let {dispatch} = this.props;
+        dispatch({
+            type:"FILTER",
+            value:e.target.value
+        });
     }
+
+    //handleFilterChange(e){
+    //    let value = e.target.value;
+    //    // console.log(value);
+    //    var records = dataSource.filter((record) => record.firstName.toUpperCase().includes(value.toUpperCase()));
+    //    this.setState({
+    //        records:records
+    //    })
+    //}
 
     updateLastName(index, newValue){
         let {records} = this.props;

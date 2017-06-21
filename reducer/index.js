@@ -23,9 +23,14 @@ let gridRecords = [
 
 export function grid(state = gridRecords, action){
     switch (action.type) {
+        case "TOGGLE_ACTIVE":
+            let newState = [...state];
+            newState[action.value].active = !newState[action.value].active;
+            return newState;
         case "FILTER":
-//I also do something on filter action
-            return state;
+            return gridRecords.filter((record)=>{
+                return record.firstName.toUpperCase().includes(action.value.toUpperCase());
+            });
         default:
             return state
     }

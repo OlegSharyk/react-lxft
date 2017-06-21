@@ -14554,7 +14554,7 @@ var GridComponent = exports.GridComponent = function (_React$Component2) {
         value: function componentDidMount() {
             this.refs.filterInput && this.refs.filterInput.focus();
             this.setState({
-                records: dataSource
+                records: this.props.records
             });
         }
     }, {
@@ -14570,15 +14570,23 @@ var GridComponent = exports.GridComponent = function (_React$Component2) {
     }, {
         key: 'handleFilterChange',
         value: function handleFilterChange(e) {
-            var value = e.target.value;
-            // console.log(value);
-            var records = dataSource.filter(function (record) {
-                return record.firstName.toUpperCase().includes(value.toUpperCase());
-            });
-            this.setState({
-                records: records
+            var dispatch = this.props.dispatch;
+
+            dispatch({
+                type: "FILTER",
+                value: e.target.value
             });
         }
+
+        //handleFilterChange(e){
+        //    let value = e.target.value;
+        //    // console.log(value);
+        //    var records = dataSource.filter((record) => record.firstName.toUpperCase().includes(value.toUpperCase()));
+        //    this.setState({
+        //        records:records
+        //    })
+        //}
+
     }, {
         key: 'updateLastName',
         value: function updateLastName(index, newValue) {
@@ -14927,6 +14935,8 @@ exports.details = details;
 
 var _redux = __webpack_require__(126);
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var gridRecords = [{ firstName: "John", lastName: "Doe", active: false, id: 1 }, { firstName: "Mary", lastName: "Moe", active: false, id: 2 }, { firstName: "Peter", lastName: "Noname", active: true, id: 3 }],
     detailsRecords = [{
     id: 1,
@@ -14947,9 +14957,14 @@ function grid() {
     var action = arguments[1];
 
     switch (action.type) {
+        case "TOGGLE_ACTIVE":
+            var newState = [].concat(_toConsumableArray(state));
+            newState[action.value].active = !newState[action.value].active;
+            return newState;
         case "FILTER":
-            //I also do something on filter action
-            return state;
+            return gridRecords.filter(function (record) {
+                return record.firstName.toUpperCase().includes(action.value.toUpperCase());
+            });
         default:
             return state;
     }
