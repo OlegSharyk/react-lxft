@@ -2,12 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {hashHistory} from 'react-router';
 import { connect } from 'react-redux';
+import {filterGrid, toggleActive} from '../actions';
 
 //const dataSource = [
 //    {firstName: 'John', lastName: "Doe", active: false, id:1},
 //    {firstName: "Mary", lastName: "Moe", active: false, id:2},
 //    {firstName: "Peter", lastName: "Noname", active: true, id:3}
 //];
+
 
 export class GridRecord extends React.Component {
     handleLastNameChange(e){
@@ -53,36 +55,31 @@ export class GridComponent extends React.Component {
     }
     componentDidMount(){
         this.refs.filterInput && this.refs.filterInput.focus();
-        this.setState({
-            records:this.props.records
+        this.loadData();
+    }
+    loadData(){
+        let {dispatch} = this.props;
+        dispatch(startLoading());
+        fetch('http://localhost:4730')
+            .then(function(response) {
+                return response.json();
+            }).then(function(json) {
+            dispatch(addData(json.gridRecords))
+        }).then(function(){
+            dispatch(stopLoading());
         })
     }
 
+
     toggleActive(index){
         let {dispatch} = this.props;
-        dispatch({
-            type:"TOGGLE_ACTIVE",
-            value:index
-        });
+        dispatch(toggleActive(index));
     }
-
 
     handleFilterChange(e){
         let {dispatch} = this.props;
-        dispatch({
-            type:"FILTER",
-            value:e.target.value
-        });
+        dispatch(filterGrid(e.target.value));
     }
-
-    //handleFilterChange(e){
-    //    let value = e.target.value;
-    //    // console.log(value);
-    //    var records = dataSource.filter((record) => record.firstName.toUpperCase().includes(value.toUpperCase()));
-    //    this.setState({
-    //        records:records
-    //    })
-    //}
 
     updateLastName(index, newValue){
         let {records} = this.props;
@@ -122,12 +119,17 @@ export class GridComponent extends React.Component {
 }
 
 GridComponent.propTypes= {
-    records: PropTypes.array.isRequired
+    records: PropTypes.array.isRequired,
+    filtered: PropTypes.array.isRequired,
+    loading: PropTypes.bool.isRequired
 };
 
 function mapStateToProps(state) {
     return {
-        records: state.grid
+        records: state.grid.records,
+        filtered: state.grid.filtered,
+        loading: state.grid.loading
+
     }
 }
 
